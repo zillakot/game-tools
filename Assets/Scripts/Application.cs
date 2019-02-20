@@ -5,16 +5,30 @@ using UniRx;
 using Unity.Linq;
 using System;
 using System.Linq;
+using UniRx.Diagnostics;
 
 public class Application : MonoBehaviour
 {
     // Start is called before the first frame update
-
+    static readonly UniRx.Diagnostics.Logger logger = new UniRx.Diagnostics.Logger("test");
     public IObservable<long> clickStream;
+
     void Start()
     {
-
+        InitLogger();
         InitMouseInput();
+        
+    }
+
+    private void InitLogger()
+    {
+        ObservableLogger.Listener.LogToUnityDebug();
+        ObservableLogger.Listener
+        .Where(x => x.LogType == LogType.Exception)
+        .Subscribe(x =>
+        {
+            Debug.Log(x.LoggerName + x.Message);
+        });
     }
 
     private void InitMouseInput()
@@ -36,22 +50,16 @@ public class Application : MonoBehaviour
             .TakeUntil(mouseUpStream)
             .Repeat();
 
-        var clickObjectStream = mouseDownStream.Select(x => toRaycastHit(x).collider?.gameObject?.name);
-
         mouseDownStream.Subscribe(x => Debug.Log("MouseDown: " + x));
         mouseUpStream.Subscribe(x => Debug.Log("MouseUp: " + x));
         mouseMoveStream.Subscribe(x => Debug.Log("MouseMove: " + x));
         mouseDragStream.Subscribe(x => Debug.Log("Drag: " + x));
-        clickObjectStream.Subscribe(x => Debug.Log("Click raycast: " + x));
-            //.Buffer(2)
-            //.Where(xs => xs.First() != xs.Last())
-            //.A
 
-        
-
-        //clickStream.Buffer(clickStream.Throttle(TimeSpan.FromMilliseconds(250)))
-        //    .Where(xs => xs.Count >= 2)
-        //    .Subscribe(xs => Debug.Log("DoubleClick Detected! Count:" + xs.Count));
+        GameObject cube;
+        mouseDownStream.Subscribe(x => {
+            cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.position = toRaycastPoint(x);
+        });
     }
 
     private Vector3 toRaycastPoint(Vector3 screenVector3)
