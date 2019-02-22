@@ -6,6 +6,7 @@ using Unity.Linq;
 using System;
 using System.Linq;
 using UniRx.Diagnostics;
+using UniRx.Triggers;
 
 public class Application : MonoBehaviour
 {
@@ -33,7 +34,7 @@ public class Application : MonoBehaviour
 
     private void InitMouseInput()
     {
-        var mouseDownStream = Observable.EveryUpdate()
+        /* var mouseDownStream = Observable.EveryUpdate()
             .Where(_ => Input.GetMouseButtonDown(0))
             .Select(_ => Input.mousePosition);
 
@@ -48,8 +49,11 @@ public class Application : MonoBehaviour
         var mouseDragStream = mouseMoveStream
             .SkipUntil(mouseDownStream)
             .TakeUntil(mouseUpStream)
-            .Repeat();
+            .Repeat(); */
 
+        this.OnMouseDownAsObservable().Subscribe(x => Debug.Log("FUU"));
+        
+        /* 
         mouseDownStream.Subscribe(x => Debug.Log("MouseDown: " + x));
         mouseUpStream.Subscribe(x => Debug.Log("MouseUp: " + x));
         mouseMoveStream.Subscribe(x => Debug.Log("MouseMove: " + x));
@@ -59,7 +63,7 @@ public class Application : MonoBehaviour
         mouseDownStream.Subscribe(x => {
             cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.position = toRaycastPoint(x);
-        });
+        }); */
     }
 
     private Vector3 toRaycastPoint(Vector3 screenVector3)
