@@ -18,18 +18,12 @@ public class Application : MonoBehaviour
     {
         InitLogger();
         InitMouseInput();
-        
+        logger.Log("logger test");
     }
 
     private void InitLogger()
     {
         ObservableLogger.Listener.LogToUnityDebug();
-        ObservableLogger.Listener
-        .Where(x => x.LogType == LogType.Exception)
-        .Subscribe(x =>
-        {
-            Debug.Log(x.LoggerName + x.Message);
-        });
     }
 
     private void InitMouseInput()
@@ -51,7 +45,7 @@ public class Application : MonoBehaviour
             .TakeUntil(mouseUpStream)
             .Repeat(); */
 
-        this.OnMouseDownAsObservable().Subscribe(x => Debug.Log("FUU"));
+        this.OnMouseDownAsObservable().Subscribe(x => logger.Log("FUU"));
         
         /* 
         mouseDownStream.Subscribe(x => Debug.Log("MouseDown: " + x));
