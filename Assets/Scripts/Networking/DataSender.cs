@@ -14,14 +14,15 @@ public static class DataSender
         ByteBuffer buffer = new ByteBuffer();
         buffer.WriteInteger((int)ClientPackets.CHelloServer);
         buffer.WriteString("Connected!");
+        Debug.Log("Send connected");
         ClientTCP.SendData(buffer.ToArray());
         buffer.Dispose();
     }
-    public static void SendPlayerPosition(Transform transform)
+    public static void SendPlayerPosition(Vector3 position)
     {
         ByteBuffer buffer = new ByteBuffer();
         buffer.WriteInteger((int)ClientPackets.CPlayerPosition);
-        buffer.WriteString(transform.ToString());
+        buffer.WriteString(position.ToString());
         ClientTCP.SendData(buffer.ToArray());
         buffer.Dispose();
     }

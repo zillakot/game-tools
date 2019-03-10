@@ -9,6 +9,7 @@ static class ClientTCP
 {
     private static TcpClient clientSocket;
     private static NetworkStream myStream;
+    private static int offset = 0;
     private static byte[] recBuffer;
     public static void InitializingNetworking()
     {
@@ -44,8 +45,9 @@ static class ClientTCP
             {
                 return;
             }
+            Debug.Log("receive");
             byte[] newBytes = new byte[length];
-            Array.Copy(recBuffer, newBytes,length);
+            Array.Copy(recBuffer, newBytes, length);
             Scheduler.MainThreadFixedUpdate.Schedule(() => ClientHandleData.HandleData(newBytes));          
             myStream.BeginRead(recBuffer, 0, 4092 * 2, ReceiveCallback, null);
         }

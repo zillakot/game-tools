@@ -27,8 +27,6 @@ static class DataReceiver
         int packetID = buffer.ReadInteger();
         string msg = buffer.ReadString();
         buffer.Dispose();
-
         Debug.Log("serverpos: " + msg);
-        DataSender.SendHelloServer();
     }
 }

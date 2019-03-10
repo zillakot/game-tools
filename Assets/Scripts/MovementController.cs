@@ -29,6 +29,13 @@ public class MovementController : MonoBehaviour
             .Subscribe(x => {
                 MouseLookRotate3(x.Item1, x.Item2);
             });
+
+        Observable.EveryUpdate()
+            .Select(_ => transform.position)
+            .Subscribe(x => {
+                Debug.Log("send playerpos: " + x);
+                DataSender.SendPlayerPosition(x);
+            });
         //this.transform.Rotate( new Vector3(x.Item2,x.Item1,0))
     }
 

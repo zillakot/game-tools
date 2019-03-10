@@ -16,7 +16,7 @@ static class ClientHandleData
         byte[] buffer = (byte[])data.Clone();
         int pLength = 0;
 
-        if(playerBuffer == null) playerBuffer = new ByteBuffer();
+        playerBuffer = new ByteBuffer();
         playerBuffer.WriteBytes(buffer);
         
         if(playerBuffer.Count() == 0)
