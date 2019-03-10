@@ -8,17 +8,50 @@ using System.Linq;
 using UniRx.Diagnostics;
 using UniRx.Triggers;
 
+public enum Move
+{
+    Left,
+    Right,
+    Up,
+    Down,
+}
+
 public class Application : MonoBehaviour
 {
     // Start is called before the first frame update
     static readonly UniRx.Diagnostics.Logger logger = new UniRx.Diagnostics.Logger("test");
     public IObservable<long> clickStream;
+    public static IObservable<string> KeyboardStream;
+    public static IObservable<Vector3> MoveStream;
+    public static IObservable<Vector3> MouseMoveStream;
+    private IEnumerable<KeyCode> moveKeyCodes = new KeyCode[]{KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.D};
+    private IEnumerable<Vector3> moveVector = new Vector3[]{Vector3.forward, -Vector3.right, -Vector3.forward, Vector3.right};
+    void Awake()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        InitLogger();
+        logger.Log("logger test");
+        KeyboardStream = Observable.EveryUpdate()
+            .Where(_ => Input.anyKey)
+            .Select(_ => Input.inputString);
 
+        MoveStream = Observable.EveryUpdate()
+            .Where(_ => Input.anyKey)
+            .Select(_ => moveKeyCodes.Select(x => Input.GetKey(x)).ToList())
+            .Where(x => x.Any(y => y))
+            //.Do(x => Debug.Log(x.Select(y => y.ToString()).Aggregate((k,l) => k+l)))
+            .Select(x => moveVector.Where((y,i) => x[i]).Aggregate((k, l) => (k + l)).normalized);
+        
+        MouseMoveStream = Observable.EveryUpdate()
+            .Select(_ => Input.mousePosition)
+            .DistinctUntilChanged();
+
+        InitMouseInput();
+    }
     void Start()
     {
-        InitLogger();
-        InitMouseInput();
-        logger.Log("logger test");
+        
+        
     }
 
     private void InitLogger()
@@ -28,7 +61,7 @@ public class Application : MonoBehaviour
 
     private void InitMouseInput()
     {
-        /* var mouseDownStream = Observable.EveryUpdate()
+        var mouseDownStream = Observable.EveryUpdate()
             .Where(_ => Input.GetMouseButtonDown(0))
             .Select(_ => Input.mousePosition);
 
@@ -43,10 +76,12 @@ public class Application : MonoBehaviour
         var mouseDragStream = mouseMoveStream
             .SkipUntil(mouseDownStream)
             .TakeUntil(mouseUpStream)
-            .Repeat(); */
+            .Repeat();
+        
+        
 
         this.OnMouseDownAsObservable().Subscribe(x => logger.Log("FUU"));
-        
+        //KeyboardStream.Subscribe(x => logger.Log(x));
         /* 
         mouseDownStream.Subscribe(x => Debug.Log("MouseDown: " + x));
         mouseUpStream.Subscribe(x => Debug.Log("MouseUp: " + x));
