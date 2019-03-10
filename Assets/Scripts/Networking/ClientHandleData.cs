@@ -6,7 +6,11 @@ static class ClientHandleData
     private static ByteBuffer playerBuffer;
     public delegate void Packet(byte[] data);
     public static Dictionary<int, Packet> packets = new Dictionary<int, Packet>();
-    public static void InitializePackets() => packets.Add((int)ServerPackets.SWelcomeMessage, DataReceiver.HandleWelcomeMessage);
+    public static void InitializePackets() 
+    {
+        packets.Add((int)ServerPackets.SWelcomeMessage, DataReceiver.HandleWelcomeMessage);
+        packets.Add((int)ServerPackets.SPlayerPosition, DataReceiver.HandlePlayerPosition);
+    }
     public static void HandleData(byte[] data)
     {
         byte[] buffer = (byte[])data.Clone();
